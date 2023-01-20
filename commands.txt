@@ -45,5 +45,11 @@ article1.like()
 for author in Author.objects.all():
     author.update_rating()
 
-best_user = Author.objects.all().order_by('-rating').first()
-print(best_user.user.username, best_user.rating)
+Author.objects.all().values("user__username", "rating").order_by('-rating').first()
+
+best_post_info = Post.objects.values("time_create", "author__user__username", "rating", "title").order_by('-rating').first() 
+best_post = Post.objects.order_by('-rating').first()
+best_post_info.update({"preview": best_post.preview()})   
+best_post_info
+
+best_post.comment_set.values("time_create", "user", "rating", "content")
