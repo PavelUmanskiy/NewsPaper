@@ -1,0 +1,17 @@
+{% extends 'default.html' %}
+{% block title %}
+<title>Главная страница</title>
+{% endblock title %}
+{% block content %}
+    <h1>Количество постов на сайте: {{posts|length}}</h1>
+    {% for post in posts %}
+        <div class="container">
+            <div class="text-start mt-5" href=>
+                <h2>{{ post.title }}</h2>
+                <p class="lead">{{ post.time_create|date:'j F Y' }} <a href="#">Читать-></a></p>
+                <p>{{ post.content|truncatechars:120|linebreaks }}</p>
+                <hr>
+            </div>   
+        </div>
+    {% endfor %}
+{% endblock content %}
