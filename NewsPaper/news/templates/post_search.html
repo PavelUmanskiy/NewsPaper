@@ -1,10 +1,15 @@
 {% extends 'default.html' %}
-{% block title %}
-<title>Главная страница</title>
-{% endblock title %}
+{% block filter %}
+    <div class="container" style="margin-top:50px;margin-bottom:50px;">
+        <form method="GET">
+            {{ filter.form }}
+            <input type="submit" value="Найти">
+        </form>
+    </div>
+{% endblock filter %}
 {% block content %}
-    <h1>Количество постов на сайте: {{posts|length}}</h1>
-    {% for post in posts %}
+    <h2>Количество постов по вашему запросу: {{filter.qs|length}}</h2>
+    {% for post in filter.qs %}
         <div class="container">
             <div class="text-start mt-5" href=>
                 <h2>{{ post.title }}</h2>

@@ -20,6 +20,9 @@ class Author(models.Model):
 
 class Category(models.Model):
     name = models.CharField(max_length=72, unique=True, verbose_name='Категория')
+    
+    def __str__(self) -> str:
+        return self.name
 
 class PostCategory(models.Model):
     post = models.ForeignKey('Post', on_delete=models.PROTECT)
