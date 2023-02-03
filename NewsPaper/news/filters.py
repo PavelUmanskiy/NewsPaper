@@ -1,18 +1,7 @@
 from django_filters import FilterSet, NumberFilter, CharFilter, \
-MultipleChoiceFilter, ChoiceFilter, LookupChoiceFilter, DateFilter
+ModelMultipleChoiceFilter, ChoiceFilter, LookupChoiceFilter, DateFilter
 
 from .models import *
-
-
-class DataProvider():
-    @classmethod
-    def get_categories_names_for_choices(cls) -> list:
-        categories_queryset = Post.objects.values_list('categories__name').distinct()
-        categories_names = [_ for _ in categories_queryset]
-        result = []
-        for category, name in categories_queryset, categories_names:
-            result.append((category, name))
-        return result
 
 
 class PostFilter(FilterSet):
@@ -23,8 +12,8 @@ class PostFilter(FilterSet):
     
     post_type = ChoiceFilter(choices=Post.POST_TYPES)
     
-    # categories__name = MultipleChoiceFilter(field_name='categories__name', label='Фильтр по категориям', 
-    #                                         choices=DataProvider.get_categories_names_for_choices())
+    categories = ModelMultipleChoiceFilter(field_name='categories', label='Фильтр по категориям',
+                                           queryset=Category.objects.all())
     
     rating = NumberFilter(field_name='rating', label='Фильтр по рейтингу')
     
@@ -36,7 +25,7 @@ class PostFilter(FilterSet):
             'author__user__username',
             'title',
             'post_type',
-            # 'categories__name',
+            'categories',
             'rating',
             'time_create'
             ]

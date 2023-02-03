@@ -1,0 +1,21 @@
+{% extends 'default.html' %}
+{% block title %}
+    <title>Редактировать профиль</title>
+{% endblock title %}
+{% block content %}
+    <form action="{% url 'profile_edit' user.id %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-error">{{form.non_field_errors}}</div>
+        {% for f in form %}
+            <div style="text-align:center;">
+                <p style="margin-bottom:0px;margin-top:8px;">
+                    <label class="form-label" for="{{ f.id_for_label }}">{{f.label}}:</label></p>
+                {{ f }}
+                <div class="form-error">{{ f.errors }}</div>
+            </div>
+        {% endfor %}
+        <div style='text-align:center;'>
+            <button type="submit" style="margin-top:10px;">Подтвердить</button>
+        </div>
+    </form>
+{% endblock content %}

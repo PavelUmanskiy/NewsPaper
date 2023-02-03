@@ -18,19 +18,32 @@
         <!-- Responsive navbar-->
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container">
-                <a class="navbar-brand" href="#">Start Bootstrap</a>
+                {% if request.user.is_authenticated %}
+					<li class="nav-item">
+                        <a class="navbar-brand" aria-current="page" href="{% url 'profile_detail' user.id %}" style="margin-right:0px;">{{user.username}} |
+                            <a class="navbar-brand" aria-current="page" href="{% url 'logout' %}">Выйти</a>
+                        {% if is_not_author %}
+                            <a class="navbar-brand" aria-current="page"  href="{% url 'upgrade' %}">Стань автором!</a>
+                        {% endif %}
+                    </li>
+				{% else %}
+					<li class="nav-item"><a class="navbar-brand" aria-current="page" href="{% url 'account_signup' %}">Регистрация</a>
+                        <a class="navbar-brand" aria-current="page" href="{% url 'account_login' %}">Войти</a></li>
+				{% endif %}
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                        <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">Home</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#">Link</a></li>
+                        <li class="nav-item"><a class="nav-link active" aria-current="page" href="{% url 'news' %}">Главная</a></li>
+                        <li class="nav-item"><a class="nav-link" href="https://github.com/PavelUmanskiy/SF-Homeworks/tree/main/NewsPaper">GitHub Repo</a></li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Dropdown</a>
+                            <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Меню</a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" href="#">Action</a></li>
+                                <li><a class="dropdown-item" href="{% url 'news_search' %}">Поиск</a></li>
                                 <li><a class="dropdown-item" href="#">Another action</a></li>
-                                <li><hr class="dropdown-divider" /></li>
-                                <li><a class="dropdown-item" href="#">Something else here</a></li>
+                                {% if request.user.is_authenticated %}
+                                    <li><hr class="dropdown-divider" /></li>
+                                    <li><a class="dropdown-item" href="{% url 'post_create' %}">Создать пост</a></li>
+                                {% endif %}
                             </ul>
                         </li>
                     </ul>

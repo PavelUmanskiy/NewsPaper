@@ -1,8 +1,9 @@
 from django.db import models
 from django.db.models import Sum
 from django.contrib.auth.models import User
+from django.urls import reverse
+
 from .utils import *
-# Create your models here.
 
 
 class Author(models.Model):
@@ -19,7 +20,7 @@ class Author(models.Model):
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=72, unique=True, verbose_name='Категория')
+    name = models.CharField(max_length=72, unique=True, verbose_name='Категории')
     
     def __str__(self) -> str:
         return self.name
@@ -48,6 +49,9 @@ class Post(LikeMixin, models.Model):
     
     def preview(self):
         return self.content[:124] + '...' if len(self.content) > 124 else self.content
+    
+    def get_absolute_url(self):
+        return reverse("post", kwargs={"pk": self.pk})
     
     
 class Comment(LikeMixin, models.Model):

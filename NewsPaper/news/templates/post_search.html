@@ -9,7 +9,7 @@
 {% endblock filter %}
 {% block content %}
     <h2>Количество постов по вашему запросу: {{filter.qs|length}}</h2>
-    {% for post in filter.qs %}
+    {% for post in posts %}
         <div class="container">
             <div class="text-start mt-5" href=>
                 <h2>{{ post.title }}</h2>
