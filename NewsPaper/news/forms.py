@@ -2,10 +2,10 @@ from django import forms
 from allauth.account.forms import SignupForm
 from django.contrib.auth.models import Group
 
-from .models import Post, User
+from .models import Post, User, Author
 
 
-class PostForm(forms.ModelForm):
+class PostForm(forms.ModelForm):            
     class Meta():
         model = Post
         fields = [

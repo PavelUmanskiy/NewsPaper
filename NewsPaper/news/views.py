@@ -10,6 +10,7 @@ from django.contrib.auth import logout
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
+from django.core.mail import send_mail
 
 from .models import *
 from .filters import *
@@ -51,12 +52,37 @@ class PostDetail(DetailView):
     model = Post
     template_name = 'post.html'
     context_object_name = 'post'
+    def dispatch(self, request, *args, **kwargs):
+        print('########################################################')
+        print(self.request, self.request.user)
+        print('########################################################')
+        return super().dispatch(request, *args, **kwargs)
 
-
-class PostCreate(PermissionRequiredMixin, CreateView):
+class PostCreate(PermissionRequiredMixin, CreateView): 
     permission_required = ('news.add_post',)
     template_name = 'post_create.html'
     form_class = PostForm
+    
+    # def post(self, request, *args, **kwargs):
+    #     form = self.form_class(request.POST, data={'author_id': Author.objects.get(user__id=self.request.user.id).pk})  
+    #     if form.is_valid(): # если пользователь ввёл всё правильно и нигде не ошибся, то сохраняем новый товар
+    #         form.save()
+    #     return super().get(request, *args, **kwargs)
+    
+    # def dispatch(self, request, *args, **kwargs):
+    #     print('########################################################')
+    #     print(self.request)
+    #     print('########################################################')
+    #     return super().dispatch(request, *args, **kwargs)
+    
+    #def post(self, request, *args, **kwargs):
+    #    send_mail(
+    #            subject=f'Новый пост в категории',  # подгрузить категорию
+    #            message=appointment.message,  # сообщение с кратким описанием проблемы
+    #            from_email='', # мой email для спама
+    #            recipient_list=[]  # здесь список получателей (те, кто подписались)
+    #    )
+    #    return super().post(request, *args, **kwargs)
 
 
 class PostUpdate(PermissionRequiredMixin, UserIsAuthorOfPostMixin, UpdateView):
