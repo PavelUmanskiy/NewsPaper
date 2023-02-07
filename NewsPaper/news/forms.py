@@ -5,7 +5,13 @@ from django.contrib.auth.models import Group
 from .models import Post, User, Author
 
 
-class PostForm(forms.ModelForm):            
+class PostForm(forms.ModelForm):
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.author = Author.objects.get(user_id=self.request.user.id)
+        return super().form_valid(form)
+    
+
     class Meta():
         model = Post
         fields = [

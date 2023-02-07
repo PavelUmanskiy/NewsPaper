@@ -17,6 +17,9 @@ class Author(models.Model):
         
         self.rating = rating_of_posts_by_author + rating_of_comments_by_author + rating_of_comments_under_posts_of_author
         self.save()
+    
+    def __str__(self) -> str:
+        return Author.objects.filter(pk=self.id).values_list('user__username')[0][0]
 
 
 class Category(models.Model):
@@ -51,7 +54,7 @@ class Post(LikeMixin, models.Model):
         return self.content[:124] + '...' if len(self.content) > 124 else self.content
     
     def get_absolute_url(self):
-        return reverse("post", kwargs={"pk": self.pk})
+        return reverse("post_detail", kwargs={"pk": self.pk})
     
     
 class Comment(LikeMixin, models.Model):
@@ -60,3 +63,20 @@ class Comment(LikeMixin, models.Model):
     content = models.CharField(max_length=512, default='Default comment', verbose_name='Комментарий')
     time_create = models.DateTimeField(auto_now_add=True, verbose_name='Время создания комментария')
     rating = models.IntegerField(default=0)
+
+
+class Subscriber(models.Model):
+    user = models.OneToOneField(User, on_delete=models.PROTECT, verbose_name='Имя')
+    categories = models.ManyToManyField(Category, through='SubscriberCategory')
+    authors = models.ManyToManyField(Author, through='SubscriberAuthor')
+    
+    
+class SubscriberCategory(models.Model):
+    subscriber = models.ForeignKey('Subscriber', on_delete=models.PROTECT)
+    category = models.ForeignKey(Category, on_delete=models.PROTECT)
+
+
+class SubscriberAuthor(models.Model):
+    subscriber = models.ForeignKey('Subscriber', on_delete=models.PROTECT)
+    author = models.ForeignKey(Author, on_delete=models.PROTECT)
+    

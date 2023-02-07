@@ -7,6 +7,7 @@
         <div class="container">
             <div class="text-start mt-5" href=>
                 <h2>{{ post.title }}</h2>
+                <h3 class="lead">{{ post.author }}</h3>
                 <p class="lead">{{ post.time_create|date:'j F Y' }} <a href="{% url 'post_detail' post.id %}">Читать-></a></p>
                 <p>{{ post.content|truncatechars:120|linebreaks }}</p>
                 <hr>
