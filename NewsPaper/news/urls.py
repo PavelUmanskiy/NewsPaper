@@ -15,5 +15,6 @@ urlpatterns = [
     path('upgrade/', upgrade_me, name='upgrade'),
     path('profile/<int:pk>/', UserDetail.as_view(), name='profile_detail'),
     path('profile/<int:pk>/edit/', UserUpdate.as_view(), name='profile_edit'),
-    path('profile/<int:pk>/delete/', UserDelete.as_view(), name='profile_delete')
+    path('profile/<int:pk>/delete/', UserDelete.as_view(), name='profile_delete'),
+    path('subscribe', subscribe, name='subscribe'),
 ]

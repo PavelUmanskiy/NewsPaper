@@ -5,9 +5,13 @@
 {% block content %}
     {% for post in posts %}
         <div class="container">
-            <div class="text-start mt-5" href=>
+            <div class="text-start mt-5">
                 <h2>{{ post.title }}</h2>
-                <h3 class="lead">{{ post.author }}</h3>
+                <h3 class="lead">{{ post.author }} Категории: 
+                    {% for category in post.categories.all %}
+                        <li class="list-inline-item">{{category}}</li>
+                    {% endfor %}
+                </h3>
                 <p class="lead">{{ post.time_create|date:'j F Y' }} <a href="{% url 'post_detail' post.id %}">Читать-></a></p>
                 <p>{{ post.content|truncatechars:120|linebreaks }}</p>
                 <hr>

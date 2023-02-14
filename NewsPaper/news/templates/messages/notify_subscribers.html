@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Уведомление</title>
+</head>
+<body><!--Почему-то не работает через url 'post_detail'-->
+    <p>Вышел новый пост на сайте, не пропустите! <a href="http://127.0.0.1:8000/news/{{post.id}}/">Читать-></a></p>
+    <h3>{{ post.title }}</h3>
+    {{ post.content|truncatechars:50 }}
+</body>
+</html>

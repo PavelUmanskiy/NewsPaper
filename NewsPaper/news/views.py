@@ -5,18 +5,20 @@ from django.views.generic import (
     CreateView,
     UpdateView,
     DeleteView,
-    )
+)
 from django.contrib.auth import logout
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
-from django.core.mail import send_mail
 
 from .models import *
 from .filters import *
 from .forms import *
-from .utils import UserIsAuthorOfPostMixin, UserIsOwnerOfProfileMixin
-# Create your views here.
+from .utils import (
+    UserIsAuthorOfPostMixin, 
+    UserIsOwnerOfProfileMixin, 
+    my_HTTP_request_console_log, 
+)
 
 
 class PostList(ListView):
@@ -52,10 +54,10 @@ class PostDetail(DetailView):
     model = Post
     template_name = 'post.html'
     context_object_name = 'post'
+    
     def dispatch(self, request, *args, **kwargs):
-        print('########################################################')
-        print(self.request, self.request.user)
-        print('########################################################')
+        request.session['post_id_for_subscription'] = request.path.partition('news')[2][1:-1]  # post_id нужен только для подписки
+        # my_HTTP_request_console_log(request=request)
         return super().dispatch(request, *args, **kwargs)
 
 class PostCreate(PermissionRequiredMixin, CreateView): 
@@ -63,26 +65,28 @@ class PostCreate(PermissionRequiredMixin, CreateView):
     template_name = 'post_create.html'
     form_class = PostForm
     
-    # def post(self, request, *args, **kwargs):
-    #     form = self.form_class(request.POST, data={'author_id': Author.objects.get(user__id=self.request.user.id).pk})  
-    #     if form.is_valid(): # если пользователь ввёл всё правильно и нигде не ошибся, то сохраняем новый товар
-    #         form.save()
-    #     return super().get(request, *args, **kwargs)
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.author = Author.objects.get(user_id=self.request.user.id)
+        return super().form_valid(form)
     
-    # def dispatch(self, request, *args, **kwargs):
-    #     print('########################################################')
-    #     print(self.request)
-    #     print('########################################################')
-    #     return super().dispatch(request, *args, **kwargs)
-    
-    #def post(self, request, *args, **kwargs):
-    #    send_mail(
-    #            subject=f'Новый пост в категории',  # подгрузить категорию
-    #            message=appointment.message,  # сообщение с кратким описанием проблемы
-    #            from_email='', # мой email для спама
-    #            recipient_list=[]  # здесь список получателей (те, кто подписались)
-    #    )
-    #    return super().post(request, *args, **kwargs)
+    def dispatch(self, request, *args, **kwargs):
+        # my_HTTP_request_console_log(request=request)
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        # my_HTTP_request_console_log(request=request)
+        # author, categories_names, recipient_list = email_info(self=self, request=request)
+        # if recipient_list:
+        #     send_mail(
+        #             subject="Новый пост в категории " +
+        #             f" {categories_names}" +
+        #             f"от {author}",
+        #             message=request.POST['content'][:50],  # сообщение с превью статьи
+        #             from_email=DEFAULT_FROM_EMAIL,
+        #             recipient_list=recipient_list # здесь список получателей (те, кто подписались)
+        #     )
+        return super().post(request, *args, **kwargs)
 
 
 class PostUpdate(PermissionRequiredMixin, UserIsAuthorOfPostMixin, UpdateView):
@@ -112,10 +116,6 @@ class UserUpdate(LoginRequiredMixin, UserIsOwnerOfProfileMixin, UpdateView):
     template_name = 'user_update.html'
     form_class = UserForm
     
-    def dispatch(self, request, *args, **kwargs):
-        print(self.request, kwargs)
-        return super().dispatch(request, *args, **kwargs)
-    
     def get_object(self, **kwargs) -> models.Model:
         id = self.kwargs.get('pk')
         return User.objects.get(pk=id)
@@ -142,3 +142,29 @@ def upgrade_me(request):
 def logout_user(request):
     logout(request)
     return redirect('news')
+
+@login_required
+def subscribe(request):
+    post_id = request.session.get('post_id_for_subscription')
+    
+    post_categories = Post.objects.get(id=post_id).categories.values_list('id')
+    post_author = Post.objects.get(pk=post_id).author_id
+    
+    if not Subscriber.objects.filter(user=request.user).exists():
+        subscriber = Subscriber.objects.create(user=request.user)
+        print(f'new subscriber {subscriber} created')
+    else:
+        subscriber = Subscriber.objects.get(user=request.user)
+        print(f'subscriber {subscriber} already exists')
+    
+    categories_subscribed = [dict_['id']  for dict_ in subscriber.categories.values('id')]
+    for post_category in post_categories:
+        if post_category[0] not in categories_subscribed:
+            subscriber.categories.add(post_category[0])
+            print(f'subscribtion on category {post_category[0]} executed')
+            
+    authors_subscribed = [dict_['id']  for dict_ in subscriber.authors.values('id')]
+    if post_author not in authors_subscribed:
+        subscriber.authors.add(post_author)
+        print(f'subscription on author {post_author} executed')
+    return redirect(f'{post_id}/')

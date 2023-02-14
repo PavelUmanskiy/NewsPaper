@@ -11,10 +11,15 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
+import os
 from dotenv import load_dotenv
 
-
-load_dotenv()  # take environment variables from .env.
+dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
+if os.path.exists(dotenv_path):
+    print('.env found')
+    load_dotenv(dotenv_path)
+else:
+    raise FileNotFoundError()
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -44,8 +49,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.sites',
     'django.contrib.staticfiles',
+    
     'news.apps.NewsConfig',
+    
     'django_filters',
+    'django_apscheduler',
+    
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -120,21 +129,17 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
-ACCOUNT_EMAIL_REQUIRED = True
-
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 1
-
-ACCOUNT_UNIQUE_EMAIL = True
-
-ACCOUNT_USERNAME_REQUIRED = False
 
 ACCOUNT_USERNAME_MIN_LENGTH = 4
 
-ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
 
-ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_EMAIL_REQUIRED = True
 
-EMAIL_BACKEND = 'django.core.mail.dummy.EmailBackend'
+ACCOUNT_EMAIL_VERIFICATION = 'optional'
+
+ACCOUNT_SESSION_REMEMBER = True
 
 ACCOUNT_FORMS = {
     'signup':'news.forms.CommonSignupForm',
@@ -167,9 +172,18 @@ STATICFILES_DIRS = [BASE_DIR / 'news/static']
 LOGIN_REDIRECT_URL = '/news/'  # success redirection
 LOGIN_URL = '/accounts/login/'  # redirection to login page
 
+
+# формат даты, которую будет воспринимать наш задачник (вспоминаем модуль по фильтрам) 
+APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
+ 
+# если задача не выполняется за 25 секунд, то она автоматически снимается
+APSCHEDULER_RUN_NOW_TIMEOUT = 25  # Seconds
+
+
 # Данные из .env
-# EMAIL_HOST - адрес сервера Яндекс-почты
-# EMAIL_PORT - порт smtp сервера
-# EMAIL_HOST_USER - имя пользователя
-# EMAIL_HOST_PASSWORD - пароль от почты
-# EMAIL_USE_SSL - Яндекс использует ssl
+EMAIL_PORT = os.getenv('EMAIL_PORT')
+EMAIL_HOST = os.getenv('EMAIL_HOST')
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')

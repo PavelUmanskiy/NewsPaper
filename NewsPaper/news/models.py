@@ -29,7 +29,7 @@ class Category(models.Model):
         return self.name
 
 class PostCategory(models.Model):
-    post = models.ForeignKey('Post', on_delete=models.PROTECT)
+    post = models.ForeignKey('Post', null=True, on_delete=models.SET_NULL)
     category = models.ForeignKey(Category, on_delete=models.PROTECT)
 
 class Post(LikeMixin, models.Model):

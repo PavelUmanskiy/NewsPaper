@@ -5,7 +5,13 @@
 {% block content %}
 <div class="container">
     <h1 class="text-center">{{ post.title }}</h1>
-    <h3 class="lead">{{ post.author }}</h3>
+    <h3 class="lead">{{ post.author }} </h3>
+    <h4 class="lead">Категории: 
+        {% for category in post.categories.all %}
+            <li class="list-inline-item">{{category}}</li>
+        {% endfor %}
+    </h4>
+        <a style="font-size:20px" href="{% url 'subscribe' %}"> Подписаться</a></h3>
     <p>{{ post.time_create|date:'j F Y'}}</p>
     <p>{{ post.content|linebreaks}}<p>
 </div>
