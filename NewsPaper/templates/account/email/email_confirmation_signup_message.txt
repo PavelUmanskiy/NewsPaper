@@ -1,1 +1,14 @@
-{% include "account/email/email_confirmation_message.txt" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    {% load account %}
+    <h1>Спасибо, что зарегистрировались, {{ user.username }}!</h1>
+    <h3>Пожалуйста, перейдите по <a href="{{ activate_url }}">этой ссылке</a> чтобы активировать Ваш аккаунт!</h3>
+    
+</body>
+</html>
