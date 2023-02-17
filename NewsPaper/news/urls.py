@@ -1,11 +1,12 @@
 from django.urls import path
 from django.shortcuts import redirect
+from django.views.decorators.cache import cache_page
 
 from .views import *
 
 
 urlpatterns = [
-    path('', PostList.as_view(), name='news'),
+    path('', cache_page(60)(PostList.as_view()), name='news'),
     path('create/', PostCreate.as_view(), name='post_create'),
     path('search/', PostSearch.as_view(), name='news_search'),
     path('<int:pk>/', PostDetail.as_view(), name='post_detail'),

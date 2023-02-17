@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
 from django.views.generic import (
     ListView,
     DetailView,
@@ -6,6 +6,7 @@ from django.views.generic import (
     UpdateView,
     DeleteView,
 )
+from django.core.cache import cache
 from django.contrib.auth import logout
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.decorators import login_required
@@ -17,7 +18,7 @@ from .forms import *
 from .utils import (
     UserIsAuthorOfPostMixin, 
     UserIsOwnerOfProfileMixin, 
-    my_HTTP_request_console_log, 
+    # my_HTTP_request_console_log, 
 )
 
 
@@ -54,6 +55,13 @@ class PostDetail(DetailView):
     model = Post
     template_name = 'post.html'
     context_object_name = 'post'
+    
+    def get_object(self, *args, **kwargs) -> models.Model:
+        object_ = cache.get(f'post-{self.kwargs["pk"]}', None)
+        if not object_:
+            object_=super().get_object(queryset=self.queryset)
+            cache.set(f'post-{self.kwargs["pk"]}', object_)
+        return object_
     
     def dispatch(self, request, *args, **kwargs):
         request.session['post_id_for_subscription'] = request.path.partition('news')[2][1:-1]  # post_id нужен только для подписки
